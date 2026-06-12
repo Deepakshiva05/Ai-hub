@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://<YOUR_RENDER_URL>/api/$1"
+      "destination": "https://ai-hub-backend-efz0.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",
