@@ -1,0 +1,110 @@
+/* Premium Glassmorphic Layouts */
+.premium-glass {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+.premium-glass-light {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.08);
+}
+
+/* Glowing Interactive Elements */
+.glow-card {
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.glow-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+  pointer-events: none;
+}
+
+.glow-card:hover::after {
+  opacity: 1;
+}
+
+/* Rotating Gradient Border on Hover */
+.premium-border-glow-wrapper {
+  position: relative;
+  padding: 1px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: background 0.3s;
+}
+
+.premium-border-glow-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: conic-gradient(
+    from 180deg,
+    transparent 0%,
+    #6366f1 25%,
+    #8b5cf6 50%,
+    #06b6d4 75%,
+    transparent 100%
+  );
+  animation: rotate-gradient 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.premium-border-glow-wrapper:hover::before {
+  opacity: 1;
+}
+
+.premium-border-glow-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #1e293b;
+  border-radius: 15px;
+  z-index: 1;
+}
+
+/* Custom Scrollbar for Smooth Scrolling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 4px;
+  border: 2px solid rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+/* Scroll snap lists */
+.snap-inline {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+.snap-item {
+  scroll-snap-align: start;
+}
