@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: ai-hub-backend
+    env: python
+    region: ohio
+    rootDir: backend-fastapi
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: HUGGINGFACE_API_KEY
+        sync: false # Set this securely in the Render dashboard
+      - key: MONGODB_URL
+        value: ""
+      - key: DATABASE_NAME
+        value: "ai_hub_premium"
