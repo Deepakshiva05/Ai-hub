@@ -20,7 +20,7 @@ export default function PremiumTranslator() {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/translate/history");
+      const response = await fetch("/api/translate/history");
       if (response.ok) {
         const data = await response.json();
         setHistory(data);
@@ -38,7 +38,7 @@ export default function PremiumTranslator() {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/translate", {
+      const response = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

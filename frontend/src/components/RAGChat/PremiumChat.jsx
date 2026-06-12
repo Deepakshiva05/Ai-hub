@@ -27,7 +27,7 @@ export default function PremiumChat() {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/rag/documents");
+      const response = await fetch("/api/rag/documents");
       if (response.ok) {
         const data = await response.json();
         setDocuments(data);
@@ -52,7 +52,7 @@ export default function PremiumChat() {
     
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/rag/chat", {
+      const response = await fetch("/api/rag/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: query })

@@ -50,7 +50,7 @@ export default function DocumentUploader({ onUploadSuccess }) {
     formData.append("file", selectedFile);
 
     try {
-      const response = await fetch("http://localhost:8000/api/rag/upload", {
+      const response = await fetch("/api/rag/upload", {
         method: "POST",
         body: formData
       });

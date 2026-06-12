@@ -30,7 +30,7 @@ export default function ImageGenerator() {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/image/history");
+      const response = await fetch("/api/image/history");
       if (response.ok) {
         const data = await response.json();
         setHistory(data);
@@ -65,7 +65,7 @@ export default function ImageGenerator() {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/image/generate", {
+      const response = await fetch("/api/image/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

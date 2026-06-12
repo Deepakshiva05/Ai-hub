@@ -13,8 +13,8 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const [statsRes, actRes] = await Promise.all([
-        fetch("http://localhost:8000/api/dashboard/stats"),
-        fetch("http://localhost:8000/api/dashboard/activity")
+        fetch("/api/dashboard/stats"),
+        fetch("/api/dashboard/activity")
       ]);
       
       if (statsRes.ok && actRes.ok) {
