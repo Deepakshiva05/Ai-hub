@@ -38,9 +38,12 @@ async def generate_image(request: ImageGenerateRequest, db = Depends(get_db)):
             async with httpx.AsyncClient(timeout=30.0) as client:
                 for _ in range(request.batch_size):
                     response = await client.post(
-                        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1",
+                        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
                         headers=headers,
-                        json={"inputs": enhanced_prompt}
+                        json={
+                            "inputs": enhanced_prompt,
+                            "options": {"wait_for_model": True}
+                        }
                     )
                     if response.status_code == 200:
                         image_bytes = response.content

@@ -83,18 +83,25 @@ async def translate_text(request: TranslationRequest, db = Depends(get_db)):
             tgt_code = lang_codes.get(target, "spa_Latn")
             
             async with httpx.AsyncClient(timeout=30.0) as client:
+                prompt = f"Translate the following text to {target}. Respond ONLY with the translated text, nothing else.\n\nText: {text}\n\nTranslation:"
                 response = await client.post(
-                    "https://api-inference.huggingface.co/models/facebook/nllb-200-distilled-600M",
+                    "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1",
                     headers=headers,
                     json={
-                        "inputs": text,
-                        "parameters": {"src_lang": "eng_Latn", "tgt_lang": tgt_code}
+                        "inputs": f"<s>[INST] {prompt} [/INST]",
+                        "parameters": {"max_new_tokens": 1024, "temperature": 0.3},
+                        "options": {"wait_for_model": True}
                     }
                 )
                 if response.status_code == 200:
                     result = response.json()
-                    if isinstance(result, list) and len(result) > 0 and "translation_text" in result[0]:
-                        translated_text = result[0]["translation_text"]
+                    if isinstance(result, list) and len(result) > 0 and "generated_text" in result[0]:
+                        gen_text = result[0]["generated_text"]
+                        # Extract text after [/INST]
+                        if "[/INST]" in gen_text:
+                            translated_text = gen_text.split("[/INST]")[-1].strip()
+                        else:
+                            translated_text = gen_text.strip()
                         pronunciation_guide = get_pronunciation(translated_text, target)
                         use_fallback = False
         except Exception:

@@ -6,6 +6,8 @@ import httpx
 import datetime
 import uuid
 import re
+import PyPDF2
+import io
 
 router = APIRouter(prefix="/api/rag", tags=["rag"])
 
@@ -19,9 +21,13 @@ async def upload_document(file: UploadFile = File(...), db = Depends(get_db)):
         if filename.endswith(".txt"):
             content = bytes_content.decode("utf-8", errors="ignore")
         elif filename.endswith(".pdf"):
-            content = f"[SIMULATED PDF INDEXING FOR {filename}]\n"
-            content += bytes_content.decode("utf-8", errors="ignore")[:3000]
-            content += "\n[Metadata: Extracted PDF visual elements, typography outlines, and structural layout data.]"
+            pdf_file = io.BytesIO(bytes_content)
+            reader = PyPDF2.PdfReader(pdf_file)
+            content = ""
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    content += text + "\n"
         else:
             content = bytes_content.decode("utf-8", errors="ignore")
             
@@ -47,8 +53,8 @@ async def upload_document(file: UploadFile = File(...), db = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Failed to process document: {str(e)}")
 
 def get_context_for_query(query: str, db) -> tuple[str, list[str]]:
-    docs = db["rag_documents"].find()
-    if not docs:
+    docs = list(db["rag_documents"].find())
+    if len(docs) == 0:
         return "", []
         
     query_words = set(re.findall(r'\w+', query.lower()))
@@ -68,7 +74,7 @@ def get_context_for_query(query: str, db) -> tuple[str, list[str]]:
     matches = sorted(matches, key=lambda x: x[1], reverse=True)
     if not matches:
         # Grab first portion of latest document
-        latest_docs = db["rag_documents"].find(sort=[("uploaded_at", -1)], limit=1)
+        latest_docs = list(db["rag_documents"].find(sort=[("uploaded_at", -1)], limit=1))
         if latest_docs:
             content = latest_docs[0].get("content", "")
             return content[:1000], [latest_docs[0].get("filename")]
@@ -99,19 +105,20 @@ async def chat_rag(request: RAGChatRequest, db = Depends(get_db)):
             headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
-                    "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta",
+                    "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1",
                     headers=headers,
                     json={
-                        "inputs": f"<|user|>\n{prompt}</s>\n<|assistant|>\n",
-                        "parameters": {"max_new_tokens": 512, "temperature": 0.7}
+                        "inputs": f"<s>[INST] {prompt} [/INST]",
+                        "parameters": {"max_new_tokens": 1024, "temperature": 0.5},
+                        "options": {"wait_for_model": True}
                     }
                 )
                 if response.status_code == 200:
                     result = response.json()
                     if isinstance(result, list) and len(result) > 0 and "generated_text" in result[0]:
                         gen_text = result[0]["generated_text"]
-                        if "<|assistant|>\n" in gen_text:
-                            reply = gen_text.split("<|assistant|>\n")[-1].strip()
+                        if "[/INST]" in gen_text:
+                            reply = gen_text.split("[/INST]")[-1].strip()
                         else:
                             reply = gen_text.strip()
                         use_fallback = False
